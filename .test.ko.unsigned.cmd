@@ -1,0 +1,1 @@
+cmd_/home/fangdong/work/kern_test/pcnt/test.ko.unsigned := ld -r -m elf_x86_64 -T /usr/src/kernels/2.6.32-358.14.1.el6.x86_64/scripts/module-common.lds --build-id -o /home/fangdong/work/kern_test/pcnt/test.ko.unsigned /home/fangdong/work/kern_test/pcnt/test.o /home/fangdong/work/kern_test/pcnt/test.mod.o 
