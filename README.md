@@ -30,4 +30,4 @@ audio/video fileop
 
 查看packets统计
 ----------
-# dmesg
+使用 dmesg 命令
