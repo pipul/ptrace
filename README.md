@@ -10,7 +10,6 @@ ptrace tool
 	sudo apt-get install linux-headers-$(uname -r)
 修改需要跟踪的IP：
 
-`
 	static void do_test(void) {
 		spin_lock_init(&pcntlock);
 
@@ -24,7 +23,7 @@ ptrace tool
 		nf_register_hook(&pcnt_ops_prerouting);
 		return;
 	}
-`
+
 该操作只需要执行一次。主要是将所有依赖安装到系统中。
 
 
