@@ -11,19 +11,19 @@ ptrace tool
 修改需要跟踪的IP：
 
 `
-static void do_test(void) {
-	spin_lock_init(&pcntlock);
+	static void do_test(void) {
+		spin_lock_init(&pcntlock);
 
 
-	//  setting the saddr and daddr
-	inet_pton4("source addr", (u_char *)&saddr_raw);
-	inet_pton4("dest addr", (u_char *)&daddr_raw); // match all localaddress
+		//  setting the saddr and daddr
+		inet_pton4("source addr", (u_char *)&saddr_raw);
+		inet_pton4("dest addr", (u_char *)&daddr_raw); // match all localaddress
 	
-	nf_register_hook(&pcnt_ops_local_in);
-	nf_register_hook(&pcnt_ops_forward);
-	nf_register_hook(&pcnt_ops_prerouting);
-	return;
-}
+		nf_register_hook(&pcnt_ops_local_in);
+		nf_register_hook(&pcnt_ops_forward);
+		nf_register_hook(&pcnt_ops_prerouting);
+		return;
+	}
 `
 该操作只需要执行一次。主要是将所有依赖安装到系统中。
 
