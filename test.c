@@ -72,15 +72,26 @@ static unsigned int pcnt_func(unsigned int hooknum, struct sk_buff *skb,
 		   const struct net_device *in, const struct net_device *out,
 		   int (*okfn)(struct sk_buff *)) {
 	const struct iphdr *iph;
-
+	const struct tcphdr *th;
 	
 	local_bh_disable();
 	spin_lock(&pcntlock);
 
 	iph = ip_hdr(skb);
+	
 	if (saddr_raw && iph->saddr != saddr_raw)
 		goto out;
 	if (daddr_raw && iph->daddr != daddr_raw)
+		goto out;
+	if (!(hooknum & PCNT_VALID_HOOKS))
+		goto out;
+
+	skb->transport_header = skb->network_header + iph->ihl * 4;
+	th = tcp_hdr(skb);
+ 
+	if (th->doff < sizeof(struct tcphdr) / 4)
+		goto out;
+	if (!th->psh)
 		goto out;
 	
 	if (hooknum == NF_INET_LOCAL_IN) {
@@ -126,8 +137,8 @@ static void do_test(void) {
 
 
 	//  setting the saddr and daddr
-	inet_pton4("106.187.45.79", (u_char *)&saddr_raw);
-	inet_pton4("", (u_char *)&daddr_raw); // match all localaddress
+	inet_pton4("127.0.0.2", (u_char *)&saddr_raw);
+	inet_pton4("127.0.0.1", (u_char *)&daddr_raw); // match all localaddress
 	
 	nf_register_hook(&pcnt_ops_local_in);
 	nf_register_hook(&pcnt_ops_forward);
