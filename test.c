@@ -5,9 +5,9 @@
 #include <linux/spinlock_types.h>
 #include <net/ip.h>
 
-#define PCNT_VALID_HOOKS ((1 << NF_INET_LOCAL_IN) | \
-			  (1 << NF_INET_PRE_ROUTING) | \
-			  (1 << NF_INET_FORWARD))
+#define PCNT_VALID_HOOKS (NF_INET_LOCAL_IN | \
+			  NF_INET_PRE_ROUTING | \
+			  NF_INET_FORWARD)
 
 static __be32 saddr_raw, daddr_raw;
 
@@ -83,14 +83,10 @@ static unsigned int pcnt_func(unsigned int hooknum, struct sk_buff *skb,
 		goto out;
 	if (daddr_raw && iph->daddr != daddr_raw)
 		goto out;
-	if (!(hooknum & PCNT_VALID_HOOKS))
-		goto out;
 
 	skb->transport_header = skb->network_header + iph->ihl * 4;
 	th = tcp_hdr(skb);
  
-	if (th->doff < sizeof(struct tcphdr) / 4)
-		goto out;
 	if (!th->psh)
 		goto out;
 	
@@ -101,8 +97,10 @@ static unsigned int pcnt_func(unsigned int hooknum, struct sk_buff *skb,
 	} else if (hooknum == NF_INET_FORWARD) {
 		packets_forward++;
 	}
-	printk(KERN_INFO "prerouting:%d forward:%d in:%d\n", packets_prerouting,
-	       packets_forward, packets_in);
+	if (hooknum == NF_INET_LOCAL_IN) {
+		printk(KERN_INFO "prerouting:%d forward:%d in:%d\n",
+		       packets_prerouting, packets_forward, packets_in);
+	}
  out:
 	spin_unlock(&pcntlock);
 	local_bh_enable();
